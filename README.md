@@ -1,4 +1,4 @@
-# AutorizaONU - Script Python para Autorização de ONU em BRIDGE da ZTE
+# Autorizar ONU - Script Python para Autorização de ONU em BRIDGE da ZTE
 Este é um script Python desenvolvido para automatizar a autorização de ONUs (Optical Network Units) em BRIDGE da marca ZTE. Utilizando as bibliotecas Netmiko e datetime, o script simplifica o processo de configuração e autorização ao solicitar apenas algumas informações do usuário.
 
 ## Funcionalidades
