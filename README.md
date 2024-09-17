@@ -30,3 +30,9 @@ Para dúvidas ou mais informações, entre em contato com: https://www.linkedin.
 
 Email:  Glguimaraes@yahoo.com
 GitHub: https://github.com/glguimaraes
+
+## IMAGENS DO PROJETO
+
+![Captura de tela 2024-09-17 164511](https://github.com/user-attachments/assets/3e6cac79-f464-4cc3-b6cc-58ce56c7799a)
+![Captura de tela 2024-09-17 164540](https://github.com/user-attachments/assets/87359101-1bac-4f65-ac35-886a093dc919)
+
