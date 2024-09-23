@@ -1,71 +1,64 @@
 #!/usr/bin/env python3
 
-
-# Importando Bibliotecas
 from netmiko import ConnectHandler
 from datetime import datetime
 
 # Parametros da OLT
 zte = {
-	'device_type': 'alcatel_aos',
-	'host': 'X.X.X.X', #IP OLT
-	'username': 'XXXXXXX',  #Usuário OLT
-	'password': 'XXXXXXX', #Senha OLT
-	}
-
-# Connect to OLT
-net_connect = ConnectHandler(**zte)
-
-# show terminal to prove connection
-net_connect.find_prompt()
-print('\n///-///-///-///-///-///-///-///-///-///-///-///-\n')
-print('SCRIPT DESENVOLVIDO POR : GUILHERME GUIMARÃES \n')
-print('///-///-///-///-///-///-///-///-///-///-///-///- \n')
+    'device_type': 'alcatel_aos',
+    'host': 'X.X.X.X',  # IP OLT
+    'username': 'XXXXXXX',  # Usuário OLT
+    'password': 'XXXXXXX',  # Senha OLT
+}
 
 
-#Serial
-serial = input("Informe o serial da ONU completo: ")
+def configurar_onu(net_connect, slot, pon, posicao, serial, nome, vlan):
+    # Entrando no modo de configuração
+    comandos = [
+        'conf t',
+        f'interface gpon_olt-1/{slot}/{pon}',
+        f'onu {posicao} type F601 sn {serial}',
+        f'interface gpon_onu-1/{slot}/{pon}:{posicao}',
+        f'name "{nome}"',
+        'tcont 1 profile 1G',
+        'gemport 1 tcont 1',
+        'exit',
+        f'pon-onu-mng gpon_onu-1/{slot}/{pon}:{posicao}',
+        f'service 1 gemport 1 vlan {vlan}',
+        f'vlan port eth_0/1 mode tag vlan {vlan}',
+        'exit',
+        f'interface vport-1/{slot}/{pon}.{posicao}:1',
+        f'service-port 1 user-vlan {vlan} vlan {vlan}',
+        'exit'
+    ]
 
-#Nome
-nome = input("Informe o nome do Cliente: ")
+    # Enviar comandos
+    net_connect.send_config_set(comandos)
 
-#Slot
-slot = input("Informe o SLOT: ")
+def main():
+    # Conectar à OLT
+    net_connect = ConnectHandler(**zte)
 
-#Pon
-pon = input("Informe a pon: ")
+    print('\n///-///-///-///-///-///-///-///-///-///-///-///-\n')
+    print('SCRIPT DESENVOLVIDO POR: GUILHERME GUIMARÃES\n')
+    print('///-///-///-///-///-///-///-///-///-///-///-///-\n')
 
-#Posição
-posicao = input("Informe a posição: ")
+    # Entradas do usuário
+    serial = input("Informe o serial da ONU completo: ")
+    nome = input("Informe o nome do Cliente: ")
+    slot = input("Informe o SLOT: ")
+    pon = input("Informe a pon: ")
+    posicao = input("Informe a posição: ")
+    vlan = input("Informe a Vlan desejada: ")
 
-#Vlan
-vlan = input("Informe a Vlan desejada: ")
+    # Configurar ONU
+    configurar_onu(net_connect, slot, pon, posicao, serial, nome, vlan)
 
-#Configurando a interface na OLT
-conf = net_connect.send_config_set('conf t')
-InterfaceOlt = net_connect.send_config_set(f'interface gpon_olt-1/{slot}/{pon}')
-Autorizando = net_connect.send_config_set(f'onu {posicao} type F601 sn {serial}')
-back = net_connect.send_config_set('exit')
+    print('ONU AUTORIZADA.')
 
-#Configurando a interface na posição da ONU
-InterfaceOnu = net_connect.send_config_set(f'interface gpon_onu-1/{slot}/{pon}:{posicao}')
-name = net_connect.send_config_set(f'name "{nome}"')
-Profile = net_connect.send_config_set('tcont 1 profile 1G')
-Tcont = net_connect.send_config_set('gemport 1 tcont 1')
-back = net_connect.send_config_set('exit')
+    # Fechar conexão
+    net_connect.disconnect()
 
-#Configurando mng
-OnuMng = net_connect.send_config_set(f'pon-onu-mng gpon_onu-1/{slot}/{pon}:{posicao}')
-Service = net_connect.send_config_set(f'service 1 gemport 1 vlan {vlan}')
-PortEth = net_connect.send_config_set(f'vlan port eth_0/1 mode tag vlan {vlan}')
-back = net_connect.send_config_set('exit')
 
-#Configurando a interface Vport
-Vport = net_connect.send_config_set(f'interface vport-1/{slot}/{pon}.{posicao}:1')
-ServicePort = net_connect.send_config_set(f'service-port 1 user-vlan {vlan} vlan {vlan}')
-back = net_connect.send_config_set('exit')
-
-print('ONU AUTORIZADA.')
-
-# disconect ssh connection
-net_connect.disconnect()
+if __name__ == '__main__':
+    main()
